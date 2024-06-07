@@ -49,8 +49,8 @@ export class UserController {
   ) {}
 
   @Get('/current')
-  @UseGuards(RoleGuard)
-  @Roles(['admin', 'operator'])
+  // @UseGuards(RoleGuard)
+  // @Roles(['admin', 'operator'])
   current(@Auth() user: User): Record<string, any> {
     return {
       data: `Welcome ${user.first_name} ${user.last_name}`,
