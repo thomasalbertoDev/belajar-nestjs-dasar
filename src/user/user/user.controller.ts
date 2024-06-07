@@ -15,6 +15,7 @@ import {
   Req,
   Res,
   UseFilters,
+  UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
@@ -30,6 +31,8 @@ import {
   loginUserRequestValidation,
 } from 'src/model/login.model';
 import { ValidationPipe } from 'src/validation/validation.pipe';
+import { TimeInterceptor } from 'src/time/time.interceptor';
+import { Auth } from 'src/auth/auth.decorator';
 
 @Controller('/api/users')
 export class UserController {
@@ -42,15 +45,26 @@ export class UserController {
     private memberService: MemberService,
   ) {}
 
+  @Get('/current')
+  current(@Auth() user: User): Record<string, any> {
+    return {
+      data: `Welcome ${user.first_name} ${user.last_name}`,
+    };
+  }
+
   @UsePipes(new ValidationPipe(loginUserRequestValidation)) // Global pipe validation
   @UseFilters(ValidationFilter)
   @Post('/login')
+  @Header('Content-Type', 'application/json')
+  @UseInterceptors(TimeInterceptor)
   login(
     @Body() request: LoginUserRequest,
     @Query('name')
     name: string,
   ) {
-    return `Welcome ${name} & ${request.username}`;
+    return {
+      data: `Welcome ${name} & ${request.username}`,
+    };
   }
 
   @Get('/connection')
